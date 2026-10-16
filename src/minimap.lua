@@ -241,6 +241,10 @@ function minimap.update()
 
     local isLocked = boussole.config.minimapLocked[1]
 
+    if boussole.isMoving and boussole.config.transparentMinimapWhenMoving[1] then
+        imgui.PushStyleVar(ImGuiStyleVar_Alpha, boussole.config.minimapMovingOpacity[1])
+    end
+
     -- Enforce square size every frame
     imgui.SetNextWindowSize({ size, size }, ImGuiCond_Always)
 
@@ -421,8 +425,14 @@ function minimap.update()
         if texturePointer then
             local drawList = imgui.GetWindowDrawList()
 
+            local opacity = 1.0
             -- Compute tint from opacity setting
-            local opacity = boussole.config.minimapOpacity and boussole.config.minimapOpacity[1] or 1.0
+            if boussole.config.minimapMovingUseDifferentOpacity[1] and boussole.isMoving then
+                opacity = boussole.config.minimapMovingOpacity and boussole.config.minimapMovingOpacity[1] or 1.0
+            else
+                opacity = boussole.config.minimapOpacity and boussole.config.minimapOpacity[1] or 1.0
+            end
+
             local alpha = math.floor(math.max(0.0, math.min(1.0, opacity)) * 255)
             local tint = bit.bor(bit.lshift(alpha, 24), 0x00FFFFFF)
 
@@ -473,8 +483,13 @@ function minimap.update()
 
             tooltip.reset()
 
+            local overlayOpacity = 1.0
             -- Draw entity overlays
-            local overlayAlpha = boussole.config.minimapOverlayOpacity and boussole.config.minimapOverlayOpacity[1] or 1.0
+            if boussole.config.minimapMovingUseDifferentOpacity[1] and boussole.isMoving then
+                overlayOpacity = boussole.config.minimapMovingOverlayOpacity and boussole.config.minimapMovingOverlayOpacity[1] or 1.0
+            else
+                overlayOpacity = boussole.config.minimapOverlayOpacity and boussole.config.minimapOverlayOpacity[1] or 1.0
+            end
             local contextLabels = boussole.config.minimapShowLabels[1]
 
             -- Build minimap-specific context to pass directly to overlays
@@ -517,37 +532,37 @@ function minimap.update()
             warp_overlay.draw(miniCtx, map.current_map_data,
                 windowPosX, windowPosY, contentMinX, contentMinY,
                 minimap.map_offset.x, minimap.map_offset.y,
-                minimap.map_zoom, texW, overlayAlpha, contextLabels)
+                minimap.map_zoom, texW, overlayOpacity, contextLabels)
 
             npc_entities.draw(miniCtx, map.current_map_data,
                 windowPosX, windowPosY, contentMinX, contentMinY,
                 minimap.map_offset.x, minimap.map_offset.y,
-                minimap.map_zoom, texW, overlayAlpha, contextLabels)
+                minimap.map_zoom, texW, overlayOpacity, contextLabels)
 
             mob_entities.draw(miniCtx, map.current_map_data,
                 windowPosX, windowPosY, contentMinX, contentMinY,
                 minimap.map_offset.x, minimap.map_offset.y,
-                minimap.map_zoom, texW, overlayAlpha, contextLabels)
+                minimap.map_zoom, texW, overlayOpacity, contextLabels)
 
             tracked_entities.draw(miniCtx, map.current_map_data,
                 windowPosX, windowPosY, contentMinX, contentMinY,
                 minimap.map_offset.x, minimap.map_offset.y,
-                minimap.map_zoom, texW, overlayAlpha, contextLabels)
+                minimap.map_zoom, texW, overlayOpacity, contextLabels)
 
             alliance_overlay.draw(miniCtx, map.current_map_data,
                 windowPosX, windowPosY, contentMinX, contentMinY,
                 minimap.map_offset.x, minimap.map_offset.y,
-                minimap.map_zoom, texW, overlayAlpha, contextLabels)
+                minimap.map_zoom, texW, overlayOpacity, contextLabels)
 
             party_overlay.draw(miniCtx, map.current_map_data,
                 windowPosX, windowPosY, contentMinX, contentMinY,
                 minimap.map_offset.x, minimap.map_offset.y,
-                minimap.map_zoom, texW, overlayAlpha, contextLabels)
+                minimap.map_zoom, texW, overlayOpacity, contextLabels)
 
             player_overlay.draw(miniCtx, map.current_map_data,
                 windowPosX, windowPosY, contentMinX, contentMinY,
                 minimap.map_offset.x, minimap.map_offset.y,
-                minimap.map_zoom, texW, overlayAlpha, contextLabels)
+                minimap.map_zoom, texW, overlayOpacity, contextLabels)
 
             drawList:PopClipRect()
 
@@ -564,6 +579,10 @@ function minimap.update()
     end
 
     imgui.End()
+
+    if boussole.isMoving and boussole.config.transparentMinimapWhenMoving[1] then
+        imgui.PopStyleVar()
+    end
 end
 
 return minimap

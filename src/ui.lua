@@ -175,14 +175,16 @@ function ui.center_on_player(mapData, availWidth, availHeight, textureWidth, tex
 end
 
 function ui.drawUI()
-    if boussole.isMoving and boussole.config.transparentWhenMoving[1] then
-        imgui.PushStyleVar(ImGuiStyleVar_Alpha, boussole.config.movingTransparency[1])
+    if boussole.isMoving and boussole.config.transparentMapWhenMoving[1] then
+        imgui.PushStyleVar(ImGuiStyleVar_Alpha, boussole.config.movingMapOpacity[1])
     end
 
     imgui.SetNextWindowSize({ 800, 600 }, ImGuiCond_FirstUseEver)
     imgui.PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 })
 
-    if imgui.Begin(ICON_FA_COMPASS .. ' boussole', boussole.visible, bit.bor(ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse)) then
+    local flags = bit.bor(ImGuiWindowFlags_NoScrollbar, ImGuiWindowFlags_NoScrollWithMouse, boussole.config.titleBarVisible[1] and 0 or ImGuiWindowFlags_NoTitleBar)
+
+    if imgui.Begin(ICON_FA_COMPASS .. ' boussole', boussole.visible, flags) then
         imgui.PopStyleVar()
 
         -- Track window focus state
@@ -429,7 +431,7 @@ function ui.drawUI()
 
             -- Draw the map texture
             local texturePointer = tonumber(ffi.cast('uint32_t', ui.texture_id))
-            local currentAlpha = (boussole.isMoving and boussole.config.transparentWhenMoving[1]) and boussole.config.movingTransparency[1] or 1.0
+            local currentAlpha = (boussole.isMoving and boussole.config.transparentMapWhenMoving[1]) and boussole.config.movingMapOpacity[1] or 1.0
             if texturePointer and map.current_map_data and map.current_map_data.entry then
                 -- Calculate position
                 local posX = windowPosX + contentMinX + ui.map_offset.x
@@ -593,7 +595,7 @@ function ui.drawUI()
     end
     imgui.End()
 
-    if boussole.isMoving and boussole.config.transparentWhenMoving[1] then
+    if boussole.isMoving and boussole.config.transparentMapWhenMoving[1] then
         imgui.PopStyleVar()
     end
 end

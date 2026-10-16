@@ -752,10 +752,12 @@ local function draw_display_tab()
     end
     imgui.PopItemWidth()
 
-    if imgui.Checkbox('Transparent when player moves', boussole.config.transparentWhenMoving) then settings.save() end
-    if boussole.config.transparentWhenMoving[1] then
+    if imgui.Checkbox('Show title bar', boussole.config.titleBarVisible) then settings.save() end
+
+    if imgui.Checkbox('Change opacity when moving', boussole.config.transparentMapWhenMoving) then settings.save() end
+    if boussole.config.transparentMapWhenMoving[1] then
         imgui.PushItemWidth(100)
-        if imgui.SliderFloat('Transparency##Moving', boussole.config.movingTransparency, 0.0, 1.0, '%.2f') then
+        if imgui.SliderFloat('Map opacity##Moving', boussole.config.movingMapOpacity, 0.0, 1.0, '%.2f') then
             settings.save()
         end
         imgui.PopItemWidth()
@@ -1419,9 +1421,22 @@ local function draw_minimap_tab()
     if imgui.SliderFloat('Map opacity', boussole.config.minimapOpacity, 0.0, 1.0, '%.2f') then
         settings.save()
     end
+
     if imgui.SliderFloat('Overlay opacity', boussole.config.minimapOverlayOpacity, 0.0, 1.0, '%.2f') then
         settings.save()
     end
+
+    if imgui.Checkbox('Use different opacity when moving', boussole.config.minimapMovingUseDifferentOpacity) then settings.save() end
+    if boussole.config.minimapMovingUseDifferentOpacity[1] then
+        if imgui.SliderFloat('Moving map opacity', boussole.config.minimapMovingOpacity, 0.0, 1.0, '%.2f') then
+            settings.save()
+        end
+
+        if imgui.SliderFloat('Moving overlay opacity', boussole.config.minimapMovingOverlayOpacity, 0.0, 1.0, '%.2f') then
+            settings.save()
+        end
+    end
+
     imgui.PopItemWidth()
     imgui.Spacing()
 
