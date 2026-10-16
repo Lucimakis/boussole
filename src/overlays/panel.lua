@@ -99,8 +99,8 @@ local function draw_display_toggle(label, displaySetting, labelSetting, id, colo
         end
     end
 
-    if controls.tag_texture then
-        local texPtr = tonumber(ffi.cast('uint32_t', controls.tag_texture))
+    if controls.tag_icon then
+        local texPtr = tonumber(ffi.cast('uint32_t', controls.tag_icon.pointer))
         local iconSize = buttonSize * 0.68
         local offset = (buttonSize - iconSize) / 2
         drawList:AddImage(
